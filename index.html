@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bikram Calendar</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Laila:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+    <script type="text/javascript" src="javascript/bikram.js"></script>
+    <script type="text/javascript" src="javascript/tithi.js"></script>
+    <script type="text/javascript" src="javascript/calendar.js"></script>
+<script type="text/javascript" src="events/events.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>विक्रम सम्बत क्यालेण्डर</h1>
+        <div class="navigation">
+            <button onclick="previousYear()">Previous Year</button>
+            <select id="monthSelector" onchange="changeMonth()">
+                <option value="1">बैसाख</option>
+                <option value="2">जेष्ठ</option>
+                <option value="3">आषाढ</option>
+                <option value="4">श्रावण</option>
+                <option value="5">भाद्र</option>
+                <option value="6">आश्विन</option>
+                <option value="7">कार्तिक</option>
+                <option value="8">मंसिर</option>
+                <option value="9">पौष</option>
+                <option value="10">माघ</option>
+                <option value="11">फागुन</option>
+                <option value="12">चैत</option>
+            </select>
+            <input type="number" id="yearInput" value="" onchange="changeYear()" />
+            <button onclick="nextYear()">Next Year</button>
+            <button class="today-button" onclick="goToToday()">Today</button>
+        </div>
+        <div id="calendar"></div><br>
+        <a href="converter.html" class="ConverterLink">&#128073; Date Converter</a>
+        <footer>
+            <p>© 2024 <a href="https://github.com/build-for-nepal">build-for-nepal</a>. This project is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License v3.0 or later</a>.</p>
+            <p>Contributors: <a href="https://github.com/build-for-nepal/bikram-calendar/contributors" target="_blank">View Contributors</a>.</p>
+            <p>For more details, see the <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GPL v3 license</a>.</p>
+        </footer>
+    </div>
+    <div id="tithiModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="tithiInfo"></p>
+        </div>
+    </div>
+
+</body>
+</html>

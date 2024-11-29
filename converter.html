@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Eczar:wght@400;500&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="javascript/bikram.js"></script>
+    <script type="text/javascript" src="javascript/tithi.js"></script>
+    <script type="text/javascript" src="javascript/converter.js"></script>
+    <style>
+        body, h1, h2, h3, label, input, select, button, div {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Eczar, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        #title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #343a40;
+        }
+
+        .language-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #languageLabel {
+            margin-right: 10px;
+        }
+
+        .language-toggle select {
+            width: auto;
+            padding: 5px;
+        }
+
+        .btn-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-color-mode-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .btn-color-mode-switch input {
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        .slider {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #007bff;
+            border-radius: 15px;
+            transition: background-color 0.4s;
+        }
+
+        .slider:before {
+            content: '⇚';
+            color: blue;
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background-color: #fff;
+            border-radius: 15px;
+            transition: transform 0.4s;
+        }
+
+        .btn-color-mode-switch input:checked + .slider:before {
+            transform: translateX(100%);
+            content: '⇛';
+            color: blue;
+        }
+
+        .converter-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .converter-container.active {
+            display: flex;
+        }
+
+        label {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: #343a40;
+        }
+
+        input[type="number"], select {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 200px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Results */
+        h3 {
+            margin-top: 20px;
+            color: #000000;
+        }
+        .CalendarLink {
+            display: block;
+            padding: 10px 20px;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 id="title">Date Converter</h1>
+
+    <div class="language-toggle">
+        <label for="language" id="languageLabel">Select Language:</label>
+        <select id="language" onchange="changeLanguage()">
+            <option id="english" value="english">English</option>
+            <option id="nepali" value="nepali">Nepali</option>
+        </select>
+    </div>
+
+    <div class="btn-container">
+        <div class="converter-title" id="convertToBikramTitle">Gregorian to Bikram Sambat</div>
+        <label class="btn-color-mode-switch">
+            <input type="checkbox" id="converterToggle" onclick="toggleConverter()">
+            <div class="slider"></div>
+        </label>
+        <div class="converter-title" id="convertToGregorianTitle">Bikram Sambat to Gregorian</div>
+    </div><br>
+
+    <div class="converter-container active" id="gregorianToBikramContainer">
+        <div class="form-group">
+            <label for="gYear" id="gYearLabel">Year:</label>
+            <input type="number" id="gYear" placeholder="YYYY" />
+        </div>
+
+        <div class="form-group">
+            <label for="gMonth" id="gMonthLabel">Month:</label>
+            <select id="gMonth"></select>
+        </div>
+
+        <div class="form-group">
+            <label for="gDay" id="gDayLabel">Day:</label>
+            <input type="number" id="gDay" placeholder="DD" />
+        </div>
+        
+        <button onclick="convertToBikram()" id="convertToBikramButton">Convert to Bikram Sambat</button>
+        
+        <h3 id="bikramResult"></h3>
+    </div>
+
+    <div class="converter-container" id="bikramToGregorianContainer">
+        <div class="form-group">
+            <label for="bsYear" id="bsYearLabel">Year:</label>
+            <input type="number" id="bsYear" placeholder="YYYY" />
+        </div>
+
+        <div class="form-group">
+            <label for="bsMonth" id="bsMonthLabel">Month:</label>
+            <select id="bsMonth"></select>
+        </div>
+
+        <div class="form-group">
+            <label for="bsDay" id="bsDayLabel">Day:</label>
+            <input type="number" id="bsDay" placeholder="DD" />
+        </div>
+        
+        <button onclick="convertToGregorian()" id="convertToGregorianButton">Convert to Gregorian</button>
+        
+        <h3 id="gregorianResult"></h3>
+    </div>
+    <a href="index.html" class="CalendarLink">&#128073;Bikram sambat Calendar</a>
+</div>
+</body>
+</html>
