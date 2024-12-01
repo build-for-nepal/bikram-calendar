@@ -10,11 +10,12 @@
             currentYear = bikram.getYear();
             currentMonth = bikram.getMonth();
             currentDay = bikram.getDay();
-
+        
             document.getElementById('yearInput').value = currentYear;
             document.getElementById('monthSelector').value = currentMonth;
-
-            generateCalendar(currentYear, currentMonth);
+            loadEventsForYear(currentYear, (events) => {
+                generateCalendar(currentYear, currentMonth, events);
+            });
         }
 
         function getfirstWeekday(year, month) {
@@ -115,10 +116,6 @@ calendarHTML += `<td class="${finalClass} ${saturdayClass}" onclick="showEventDe
         <div class="gregorian">${gregorianDate.day}</div>
     </div>
 </td>`;
-
-
-
-
         if ((firstDayOfMonth + day) % 7 === 0 && day !== daysInMonth) {
             calendarHTML += '</tr><tr>';
         }
@@ -135,9 +132,50 @@ calendarHTML += `<td class="${finalClass} ${saturdayClass}" onclick="showEventDe
     calendarDiv.innerHTML = calendarHTML;
 }
 
+// loads yearly bikramFixedEvents from files
+function loadEventsForYear(year, callback) {
+    console.log(`Loading events for the year ${year}`);
+    const scriptUrl = `events/events-${year}.js`;
 
+    fetch(scriptUrl)
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.clear();
+                    console.log(`No events file found for the year ${year}.`);
+                    callback([]); 
+                    return; 
+                } else {
+                    console.error(`Error fetching events: ${response.statusText}`);
+                    callback([]); 
+                    return;
+                }
+            }
+            return response.text();
+        })
+        .then(scriptContent => {
+            if (scriptContent.trim() === '') {
+                console.log(`The events file for the year ${year} is empty.`);
+                callback([]); 
+                return;
+            }
 
+            const scriptElement = document.createElement('script');
+            scriptElement.textContent = scriptContent;
+            document.head.appendChild(scriptElement);
 
+            if (typeof bikramFixedEvents !== 'undefined' && Array.isArray(bikramFixedEvents) && bikramFixedEvents.length > 0) {
+                callback(bikramFixedEvents);
+            } else {
+                console.log(`No events found in the file for the year ${year}.`);
+                callback([]);
+            }
+        })
+        .catch(error => {
+            console.log("Error loading events !"); 
+            callback([]); 
+        });
+}
 
 function checkEvent(events, year, month, day, dateType) {
     let hasEvent = false;
@@ -286,25 +324,49 @@ window.onclick = function(event) {
             currentYear--;
             document.getElementById('yearInput').value = currentYear;
             generateCalendar(currentYear, currentMonth);
+            loadEventsForYear(currentYear, (events) => {
+                generateCalendar(currentYear, currentMonth, events);
+            });
         }
 
         function nextYear() {
             currentYear++;
             document.getElementById('yearInput').value = currentYear;
             generateCalendar(currentYear, currentMonth);
+            loadEventsForYear(currentYear, (events) => {
+                generateCalendar(currentYear, currentMonth, events);
+            });
         }
 
         function changeMonth() {
             currentMonth = parseInt(document.getElementById('monthSelector').value);
             generateCalendar(currentYear, currentMonth);
+            loadEventsForYear(currentYear, (events) => {
+                generateCalendar(currentYear, currentMonth, events);
+            });
         }
 
         function changeYear() {
             currentYear = parseInt(document.getElementById('yearInput').value);
-            generateCalendar(currentYear, currentMonth);
+            loadEventsForYear(currentYear, (events) => {
+                generateCalendar(currentYear, currentMonth, events);
+                loadEventsForYear(currentYear, (events) => {
+                    generateCalendar(currentYear, currentMonth, events);
+                });
+            });
         }
 
-        function goToToday() { const today = new Date(); const bikram = new Bikram(); bikram.fromGregorian(today.getFullYear(), today.getMonth() + 1, today.getDate()); currentYear = bikram.getYear(); currentMonth = bikram.getMonth(); document.getElementById('yearInput').value = currentYear; document.getElementById('monthSelector').value = currentMonth; generateCalendar(currentYear, currentMonth); 
+        function goToToday() {
+             const today = new Date();
+            const bikram = new Bikram();
+             bikram.fromGregorian(today.getFullYear(), today.getMonth() + 1, today.getDate());
+             currentYear = bikram.getYear();
+             currentMonth = bikram.getMonth();
+             document.getElementById('yearInput').value = currentYear;
+             document.getElementById('monthSelector').value = currentMonth;
+             loadEventsForYear(currentYear, (events) => {
+                generateCalendar(currentYear, currentMonth, events);
+            });
         }
 
         function getGregorianDate(year, month, day) {
@@ -342,4 +404,3 @@ function formatGregorianMonthDisplay(gregorianStart, gregorianEnd) {
 
 
         window.onload = showCurrentMonth;
-        

@@ -94,7 +94,7 @@ function getPaksha(tithiIndex) {
     return (tithiIndex < 15) ? "शुक्ल पक्ष" : "कृष्ण पक्ष"; // Shukla Paksha or Krishna Paksha
 }
 
-// Example usage:
+/* Example usage:
 const today = new Date();
 const year = today.getFullYear();
 const month = today.getMonth() + 1; // Months are zero-based in JavaScript
@@ -102,4 +102,4 @@ const day = today.getDate();
 
 const result = calculateTithi(year, month, day);
 
-console.log(`Tithi: ${result.tithi}, Paksha: ${result.paksha}, Today: ${year}-${month}-${day}`);
+console.log(`Tithi: ${result.tithi}, Paksha: ${result.paksha}, Today: ${year}-${month}-${day}`); */
