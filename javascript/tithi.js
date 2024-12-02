@@ -16,29 +16,52 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 function calculateTithi(year, month, day) {
     // Nepal Time Offset (UTC+5:45) in minutes
     const nepalTimeOffsetMinutes = 5 * 60 + 45; // 5 hours and 45 minutes in minutes
     const localOffsetMinutes = new Date().getTimezoneOffset(); // This is negative for UTC+ and positive for UTC-
     const totalOffsetMinutes = nepalTimeOffsetMinutes - localOffsetMinutes;
-    const adjustedDay = day - Math.floor(totalOffsetMinutes / (60 * 24)); // Adjust for day rollover
 
-    const tdays = calculateDaysSinceJ2000(year, month, adjustedDay);
-    const t = tdays / 36525.0;
-    const tithiIndex = calculateTithiIndex(t);
+    // Adjust for the day based on timezone offset
+    const adjustedDate = new Date(Date.UTC(year, month - 1, day));
+    adjustedDate.setUTCDate(adjustedDate.getUTCDate() + Math.floor(totalOffsetMinutes / (60 * 24)));
+    
+    const adjustedYear = adjustedDate.getUTCFullYear();
+    const adjustedMonth = adjustedDate.getUTCMonth() + 1; // Months are zero-based in JavaScript
+    const adjustedDay = adjustedDate.getUTCDate();
+
+    const tdays = Math.floor(calculateDaysSinceJ2000(adjustedYear, adjustedMonth, adjustedDay)); // Use Math.floor to ensure whole number
+    const t = tdays / 36525.0; // t is in Julian centuries since J2000
+    let tithiIndex = calculateTithiIndex(t);
+    
+    // Handle negative Tithi index
+    if (tithiIndex < 0) {
+        tithiIndex = Math.abs(tithiIndex);
+    }
+    
+    // Wrap around and round according to the specified rules
+    tithiIndex = Math.round(tithiIndex) % 30; // Round and wrap to ensure valid index
+
+ // Debugging output
+ // console.log(`Year: ${year}, Month: ${month}, Day: ${day}`);
+ // console.log(`Adjusted Year: ${adjustedYear}, Adjusted Month: ${adjustedMonth}, Adjusted Day: ${adjustedDay}`);
+ // console.log(`Days Since J2000: ${tdays}, t: ${t}, Tithi Index: ${tithiIndex}`);
+    
+    const tithiName = getTithiName(tithiIndex);
+    
     return {
-        tithi: getTithiName(tithiIndex),
+        tithi: tithiName || "अज्ञात", // Return "अज्ञात" if tithi is undefined
         paksha: getPaksha(tithiIndex)
     };
 }
 
 function calculateDaysSinceJ2000(year, month, day) {
     const julianDate = getJulianDate(year, month, day);
-    return julianDate - 2451545.0; // J2000.0 Julian date
+    return Math.floor(julianDate - 2451545.0); // J2000.0 Julian date
 }
 
 function getJulianDate(year, month, day) {
+    // Adjust for January and February
     if (month <= 2) {
         year -= 1;
         month += 12;
@@ -55,7 +78,9 @@ function calculateTithiIndex(t) {
     let difference = moonLongitude - sunLongitude;
     if (difference < 0) difference += 360.0;
 
-    return Math.floor(difference / 12.0);
+    // Calculate the Tithi index based on the difference
+    const tithiIndex = difference / 12.0; // This will be a floating-point number
+    return tithiIndex; // Return without wrapping, to handle negative cases later
 }
 
 function getSunLongitude(t) {
@@ -70,30 +95,26 @@ function getSunLongitude(t) {
 }
 
 function getMoonLongitude(t) {
-    let L1 = 218.316 + 481267.8813 * t;
-    let M1 = 134.963 + 477198.8676 * t;
-    
-    L1 = L1 % 360;
-    M1 = M1 % 360;
+    const L1 = 218.316 + 481267.8813 * t;
+    const M1 = 134.963 + 477198.8676 * t;
 
-    const longitude = (L1 + 6.289 * Math.sin(M1 * Math.PI / 180)) % 360;
+    const longitude = (L1 + 6.289 * Math.sin(M1 * Math.PI / 180) - 1.274 * Math.sin((2 * L1 - M1) * Math.PI / 180) + 0.658 * Math.sin(2 * L1 * Math.PI / 180)) % 360;
     return longitude;
 }
 
 function getTithiName(tithiIndex) {
     const tithiNames = [
-        "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", "पंचमी", "षष्ठी", "सप्तमी", "अष्टमी",
-        "नवमी", "दशमी", "एकादशी", "द्वादशी", "त्रयोदशी", "चतुर्दशी", "पूर्णिमा", "प्रथमा", 
-        "द्वितीया", "तृतीया", "चतुर्थी", "पंचमी", "षष्ठी", "सप्तमी", "अष्टमी", "नवमी", "दशमी", 
-        "एकादशी", "द्वादशी", "त्रयोदशी", "चतुर्दशी", "अमावस्या"
+        "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", "पञ्चमी", "षष्ठी", "सप्तमी", "अष्टमी", 
+        "नवमी", "दशमी", "एकादशी", "द्वादशी", "त्रयोदशी", "चतुर्दशी", "पूर्णिमा", 
+        "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", "पञ्चमी", "षष्ठी", "सप्तमी", 
+        "अष्टमी", "नवमी", "दशमी", "एकादशी", "द्वादशी", "त्रयोदशी", "चतुर्दशी", "अमावस्या"
     ];
     return tithiNames[tithiIndex];
 }
 
 function getPaksha(tithiIndex) {
-    return (tithiIndex < 15) ? "शुक्ल पक्ष" : "कृष्ण पक्ष"; // Shukla Paksha or Krishna Paksha
-}
-
+    return tithiIndex < 15 ? "शुक्ल" : "कृष्ण"; 
+} 
 /* Example usage:
 const today = new Date();
 const year = today.getFullYear();

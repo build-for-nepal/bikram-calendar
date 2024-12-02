@@ -105,7 +105,7 @@ if (hasEvent) {
 }
 
 // Add the HTML for the calendar cell
-calendarHTML += `<td class="${finalClass} ${saturdayClass}" onclick="showEventDetails('${convertToDevanagari(day)}/${convertToDevanagari(month)}/${convertToDevanagari(year)}', '${tithi.tithi.replace(/'/g, "\\'")}', '${tithi.paksha.replace(/'/g, "\\'")}', '${gregorianDate.day}/${gregorianDate.month}/${gregorianDate.year}', '${year}', '${month}', '${day}', '${eventText.replace(/'/g, "\\'")}', '${eventDetail.replace(/'/g, "\\'")}')">
+calendarHTML += `<td class="${finalClass} ${saturdayClass}" onclick="showEventDetails('${convertToDevanagari(day)}/${convertToDevanagari(month)}/${convertToDevanagari(year)}', '${tithi.tithi}', '${tithi.paksha}', '${gregorianDate.day}/${gregorianDate.month}/${gregorianDate.year}', '${year}', '${month}', '${day}', '${eventText.replace(/'/g, "\\'")}', '${eventDetail.replace(/'/g, "\\'")}')">
     <div class="day-content">
         <div>${convertToDevanagari(day)}</div>
         <div class="tithi">
