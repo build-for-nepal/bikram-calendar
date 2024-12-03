@@ -74,10 +74,10 @@ function generateCalendar(year, month) {
         // Highlight Saturdays (index 6)
         const saturdayClass = (firstDayOfMonth + day - 1) % 7 === 6 ? 'saturday' : '';
         const finalClass = className ? ` ${className}` : '';
-        
-        // Calculate Tithi
+        // Initialize Tithi
+        const tithiCalculate = new Tithi();
         const gregorianDate = bikram.toGregorian(year, month, day);
-        const tithi = calculateTithi(gregorianDate.year, gregorianDate.month, gregorianDate.day);
+        const tithi = tithiCalculate.calculateTithi(gregorianDate.year, gregorianDate.month, gregorianDate.day);
         
         let tithiImage = '';
 if (tithi.tithi === 'पूर्णिमा') {
@@ -137,46 +137,24 @@ function loadEventsForYear(year, callback) {
     console.log(`Loading events for the year ${year}`);
     const scriptUrl = `events/events-${year}.js`;
 
-    fetch(scriptUrl)
-        .then(response => {
-            if (!response.ok) {
-                if (response.status === 404) {
-                    console.clear();
-                    console.log(`No events file found for the year ${year}.`);
-                    callback([]); 
-                    return; 
-                } else {
-                    console.error(`Error fetching events: ${response.statusText}`);
-                    callback([]); 
-                    return;
-                }
-            }
-            return response.text();
-        })
-        .then(scriptContent => {
-            if (scriptContent.trim() === '') {
-                console.log(`The events file for the year ${year} is empty.`);
-                callback([]); 
-                return;
-            }
+    const scriptElement = document.createElement('script');
+    scriptElement.src = scriptUrl;
+    scriptElement.onload = () => {
+        // Check if the variable is defined after the script is loaded
+        if (typeof bikramFixedEvents !== 'undefined' && Array.isArray(bikramFixedEvents) && bikramFixedEvents.length > 0) {
+            callback(bikramFixedEvents);
+        } else {
+            console.log(`No events found in the file for the year ${year}.`);
+            callback([]);
+        }
+    };
+    scriptElement.onerror = () => {
+        console.error(`Error loading script: ${scriptUrl}`);
+        callback([]);
+    };
 
-            const scriptElement = document.createElement('script');
-            scriptElement.textContent = scriptContent;
-            document.head.appendChild(scriptElement);
-
-            if (typeof bikramFixedEvents !== 'undefined' && Array.isArray(bikramFixedEvents) && bikramFixedEvents.length > 0) {
-                callback(bikramFixedEvents);
-            } else {
-                console.log(`No events found in the file for the year ${year}.`);
-                callback([]);
-            }
-        })
-        .catch(error => {
-            console.log("Error loading events !"); 
-            callback([]); 
-        });
+    document.head.appendChild(scriptElement);
 }
-
 function checkEvent(events, year, month, day, dateType) {
     let hasEvent = false;
     events.forEach(event => {

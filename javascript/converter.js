@@ -172,6 +172,8 @@
         const gYear = parseInt(document.getElementById("gYear").value);
         const gMonth = document.getElementById("gMonth").selectedIndex + 1;
         const gDay = parseInt(document.getElementById("gDay").value);
+        
+        // Create an instance of Bikram
         const bikram = new Bikram();
         bikram.fromGregorian(gYear, gMonth, gDay);
         const bikramYear = bikram.getYear();
@@ -179,10 +181,15 @@
         const bikramMonthName = bikram.getMonthName(bikramMonth);
         const bikramDay = bikram.getDay();
         const weekdayName = bikram.getWeekdayName(gYear, gMonth, gDay);
-        const tithiInfo = calculateTithi(gYear, gMonth, gDay);
+        
+        // Initialize Tithi
+        const tithiCalculate = new Tithi();
+        const tithiInfo = tithiCalculate.calculateTithi(gYear, gMonth, gDay);
+        
         const tithiDisplay = tithiInfo.tithi;
         const pakshaDisplay = tithiInfo.paksha;
-        document.getElementById("bikramResult").innerText = `${bikramYear} ${bikramMonthName} ${bikramDay} ${weekdayName} (${pakshaDisplay}, ${tithiDisplay})`;
+        document.getElementById("bikramResult").innerText = 
+            `${bikramYear} ${bikramMonthName} ${bikramDay} ${weekdayName} (${pakshaDisplay}, ${tithiDisplay})`;
     }
     
     function convertToGregorian() {

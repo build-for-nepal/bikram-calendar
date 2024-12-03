@@ -167,3 +167,96 @@
     }
 }
         }
+        class Tithi {
+            calculateTithi(year, month, day, longitude = 86.25) {
+                // Nepal Time Offset (UTC+5:45) in hours
+                const nepalTimeOffset = 5.75; // 5 hours and 45 minutes
+        
+                // Calculate the Julian Date
+                const julianDate = this.getJulianDate(year, month, day);
+                
+                // Calculate tdays and t
+                const tdays = julianDate - 2451545.0; // Days since J2000.0
+                const t = tdays / 36525.0; // Julian centuries since J2000
+        
+                // Calculate Sun and Moon longitudes
+                let moonLongitude = this.getMoonLongitude(t);
+                let sunLongitude = this.getSunLongitude(t);
+        
+                // Adjust for Nepal time
+                const localTimeAdjustment = (nepalTimeOffset - (longitude / 360) * 24); // Convert longitude to time adjustment
+                moonLongitude = this.adjustLongitude(moonLongitude, localTimeAdjustment);
+                sunLongitude = this.adjustLongitude(sunLongitude, localTimeAdjustment);
+        
+                // Calculate Tithi index
+                let difference = moonLongitude - sunLongitude;
+                if (difference < 0) difference += 360.0;
+        
+                let tithiIndex = Math.floor(difference / 12.0); // Use floor to avoid negative indices
+        
+                // Wrap the tithi index to ensure it falls within 0-29
+                tithiIndex = (tithiIndex + 30) % 30; 
+        
+                // Get Tithi name and Paksha
+                const tithiName = this.getTithiName(tithiIndex);
+                const paksha = this.getPaksha(tithiIndex);
+        
+                return {
+                    tithi: tithiName || "अज्ञात",
+                    paksha: paksha
+                };
+            }
+        
+            adjustLongitude(longitude, timeAdjustment) {
+                // Adjust the longitude based on the time adjustment for Nepal
+                longitude += timeAdjustment * 15; // Each hour corresponds to 15 degrees
+                return (longitude + 360) % 360; // Wrap around to keep within 0-360 degrees
+            }
+        
+            getJulianDate(year, month, day) {
+                if (month <= 2) {
+                    year -= 1;
+                    month += 12;
+                }
+                const a = Math.floor(year / 100);
+                const b = 2 - a + Math.floor(a / 4);
+                return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + b - 1524.5;
+            }
+        
+            getMoonLongitude(t) {
+                const L1 = 218.316 + 481267.8813 * t;
+                const D = 297.8502 + 445267.1115 * t;
+                const M = 357.5291 + 35999.0503 * t;
+                const M1 = 134.963 + 477198.8671 * t;
+                const F = 93.272 + 483202.0175 * t;
+            
+                const moonLongitude = L1 + (6.289 * Math.sin(M1 * Math.PI / 180)) - (1.274 * Math.sin((2 * D - M1) * Math.PI / 180)) - (0.658 * Math.sin(2 * D * Math.PI / 180)) - (0.214 * Math.sin((2 * M1) * Math.PI / 180)) + (0.11 * Math.sin((D) * Math.PI / 180));
+                return moonLongitude % 360;
+            }
+        
+            getSunLongitude(t) {
+                const l0 = 280.4665 + 36000.7698 * t;
+                const m = 357.5291 + 35999.0503 * t;
+                const c = (1.9146 - 0.004817 * t - 0.000014 * t * t) * Math.sin(m * Math.PI / 180)
+                          + (0.019993 - 0.000101 * t) * Math.sin(2 * m * Math.PI / 180) 
+                          + 0.000289 * Math.sin(3 * m * Math.PI / 180);
+                const sunLongitude = l0 + c;
+                return sunLongitude % 360;
+            }
+        
+            getTithiName(tithiIndex) {
+                const tithiNames = [
+                    "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", "पञ्चमी", 
+                    "षष्ठी", "सप्तमी", "अष्टमी", "नवमी", "दशमी", 
+                    "एकादशी", "द्वादशी", "त्रयोदशी", "चतुर्दशी", "पूर्णिमा", 
+                    "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", "पञ्चमी", 
+                    "षष्ठी", "सप्तमी", "अष्टमी", "नवमी", "दशमी", 
+                    "एकादशी", "द्वादशी", "त्रयोदशी", "चतुर्दशी", "अमावस्या"
+                ];
+                return tithiNames[tithiIndex];
+            }
+        
+            getPaksha(tithiIndex) {
+                return tithiIndex < 15 ? "शुक्ल" : "कृष्ण";
+            }
+        }
