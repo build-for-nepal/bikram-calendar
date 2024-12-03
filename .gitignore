@@ -24,7 +24,7 @@ coverage/
 
 # Jest test results
 jest-test-results.json
-jest.config.js
+
 
 # IDE and editor-specific files
 .vscode/
@@ -40,5 +40,3 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
