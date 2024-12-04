@@ -1,7 +1,14 @@
 /*
- * Copyright (C) 2024 Khumnath CG ,  Build-for-Nepal and contributors (https://github.com/build-for-nepal/bikram-calendar/graphs/contributors)
+ * Copyright (C) 2024 Khumnath CG , Build-for-Nepal and contributors (https://github.com/build-for-nepal/bikram-calendar/graphs/contributors)
  * Khumnath(nath.khum@gmail.com)
  *
+ * The Bikram Sambat and Tithi functionalities are implemented using calculations from 
+ * port of the Perl script Pancanga library by M. Fushimi and M. Yano. For detailed information, consult the original documentation:
+ * 
+ * http://www.cc.kyoto-su.ac.jp/~yanom/pancanga/message314.html
+ * http://www.cc.kyoto-su.ac.jp/~yanom/sanskrit/pancanga/pancanga3.14
+ * 
+ * All bikram sambat calculations are based on surya siddanta(ancient astronomy book).
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +47,13 @@ export class Bikram {
         this.rad = 57.2957795; // = 180/pi
     }
 
+        /**
+     * Calculate the Julian date for a given Gregorian date.
+     * @param year - Gregorian year
+     * @param month - Gregorian month (1-12)
+     * @param day - Gregorian day (1-31)
+     * @returns Julian date
+     */
     getJulianDate(year: number, month: number, day: number): number {
         if (month <= 2) {
             year -= 1;
@@ -50,6 +64,11 @@ export class Bikram {
         return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + b - 1524.5;
     }
 
+        /**
+     * Convert a Julian date to a Gregorian date.
+     * @param julian_date - Julian date
+     * @returns Object containing year, month, and day
+     */
     fromJulianDate(julian_date: number): { year: number; month: number; day: number } {
         const a = Math.floor(julian_date + 0.5);
         const b = a + 1537;
@@ -63,6 +82,11 @@ export class Bikram {
         return { year, month, day };
     }
 
+        /**
+     * Get the Saura Masa month and day for a given Ahargana.
+     * @param ahar - Ahargana (days since epoch)
+     * @returns Object containing month and day
+     */
     getSauraMasaDay(ahar: number): { month: number; day: number } {
         let month: number, day: number;
         if (this.todaySauraMasaFirstP(ahar)) {
@@ -77,6 +101,11 @@ export class Bikram {
         return { month, day };
     }
 
+        /**
+     * Check if today is the first day of the Saura Masa month.
+     * @param ahar - Ahargana (days since epoch)
+     * @returns 1 if true, 0 otherwise
+     */
     todaySauraMasaFirstP(ahar: number): number {
         const tslong_today = this.getTslong(ahar);
         const tslong_tomorrow = this.getTslong(ahar + 1);
@@ -85,6 +114,11 @@ export class Bikram {
         return (25 < today_mod && tomorrow_mod < 5) ? 1 : 0;
     }
 
+        /**
+     * Get the true solar longitude for a given Ahargana.
+     * @param ahar - Ahargana (days since epoch)
+     * @returns True solar longitude
+     */
     getTslong(ahar: number): number {
         const t1 = (this.YugaRotation_sun * ahar / this.YugaCivilDays) % 1;
         const mslong = 360 * t1;
@@ -96,6 +130,12 @@ export class Bikram {
         return mslong - x2;
     }
 
+        /**
+     * Get the number of days in a given Bikram Sambat month.
+     * @param bsYear - Bikram Sambat year
+     * @param bsMonth - Bikram Sambat month (1-12)
+     * @returns Number of days in the month
+     */
     daysInMonth(bsYear: number, bsMonth: number): number {
         let { year: gYear, month: gMonth, day: gDay } = this.toGregorian(bsYear, bsMonth, 1);
         let julian_date_start = this.getJulianDate(gYear, gMonth, gDay);
@@ -106,6 +146,12 @@ export class Bikram {
         return Math.floor(julian_date_end - julian_date_start);
     }
 
+        /**
+     * Convert a Gregorian date to a Bikram Sambat date.
+     * @param y - Gregorian year
+     * @param m - Gregorian month (1-12)
+     * @param d - Gregorian day (1-31)
+     */
     fromGregorian(y: number, m: number, d: number): void {
         const julian = this.getJulianDate(y, m, d);
         const ahar = julian - 588465.5;
@@ -118,6 +164,13 @@ export class Bikram {
         this.Day = saura_masa_day;
     }
 
+        /**
+     * Convert a Bikram Sambat date to a Gregorian date.
+     * @param bsYear - Bikram Sambat year
+     * @param bsMonth - Bikram Sambat month (1-12)
+     * @param bsDay - Bikram Sambat day (1-31)
+     * @returns Object containing year, month, and day
+     */
     toGregorian(bsYear: number, bsMonth: number, bsDay: number): { year: number; month: number; day: number } {
         const YearSaka = bsYear - 135;
         const YearKali = YearSaka + 3179;
@@ -134,6 +187,10 @@ export class Bikram {
         return this.fromJulianDate(julian_date);
     }
 
+        /**
+     * Get the Nepali date as a string.
+     * @returns Nepali date in YYYY-MM-DD format
+     */
     fromNepali(bsYear: number, bsMonth: number, bsDay: number): void {
         const { year, month, day } = this.toGregorian(bsYear, bsMonth, bsDay);
         this.Year = year;
@@ -141,18 +198,37 @@ export class Bikram {
         this.Day = day;
     }
 
+        /**
+     * Get the Bikram Sambat year.
+     * @returns Bikram Sambat year
+     */
     getYear(): number {
         return this.Year;
     }
 
+        /**
+     * Get the Bikram Sambat month.
+     * @returns Bikram Sambat month (1-12)
+     */
     getMonth(): number {
         return this.Month + 1; // Return 1-based month
     }
 
+        /**
+     * Get the Bikram Sambat day.
+     * @returns Bikram Sambat day (1-31)
+     */
     getDay(): number {
         return this.Day;
     }
 
+/**
+ * Get the name of the weekday for a given date in Nepali.
+ * @param year - Gregorian year
+ * @param month - Gregorian month (1-12)
+ * @param day - Gregorian day (1-31)
+ * @returns Name of the weekday in Nepali
+ */
     getWeekdayName(year: number, month: number, day: number): string {
         const nepaliDays = ["आइतबार", "सोमबार", "मंगलबार", "बुधबार", "बिहीबार", "शुक्रबार", "शनिबार"];
         const timeinfo = new Date(year, month - 1, day);
@@ -160,13 +236,30 @@ export class Bikram {
         return nepaliDays[weekdayIndex];
     }
 
+    /**
+ * Get the name of the Nepali month.
+ * @param month - Bikram Sambat month (1-12)
+ * @returns Name of the Nepali month
+ */
     getMonthName(month: number): string {
-        const nepaliMonths = ["बैसाख", "जेष्ठ", "आषाढ", "श्रावण", "भाद्र", "आश्विन", "कार ्तिक", "मंसिर", "पौष", "माघ", "फागुन", "चैत"];
-            return nepaliMonths[month - 1]; // month is 1-based
+        const nepaliMonths = ["बैसाख", "जेष्ठ", "आषाढ", "श्रावण", "भाद्र", "आश्विन", "कार्तिक", "मंसिर", "पौष", "माघ", "फागुन", "चैत"];
+        return nepaliMonths[month - 1];
     }
 }
 
+/**
+ * Tithi Calculation Utilities
+ */
 export class Tithi {
+
+    /**
+     * Calculate the Tithi for a given Gregorian date and longitude.
+     * @param year - Gregorian year
+     * @param month - Gregorian month (1-12)
+     * @param day - Gregorian day (1-31)
+     * @param longitude - Longitude for calculation (default: 86.25)
+     * @returns Object containing the tithi name and paksha
+     */
     calculateTithi(year: number, month: number, day: number, longitude: number = 86.25): { tithi: string; paksha: string } {
         const nepalTimeOffset = 5.75; // 5 hours and 45 minutes
         const julianDate = this.getJulianDate(year, month, day);
@@ -195,11 +288,24 @@ export class Tithi {
         };
     }
 
+    /**
+     * Adjust the longitude based on the time adjustment for nepal.
+     * @param longitude - Longitude to adjust
+     * @param timeAdjustment - Time adjustment in hours
+     * @returns Adjusted longitude
+     */
     adjustLongitude(longitude: number, timeAdjustment: number): number {
-        longitude += timeAdjustment * 15; // Each hour corresponds to 15 degrees
-        return (longitude + 360) % 360; // Wrap around to keep within 0-360 degrees
+        longitude += timeAdjustment * 15;
+        return (longitude + 360) % 360;
     }
 
+    /**
+     * Calculate Julian Date from Gregorian date.
+     * @param year - Gregorian year
+     * @param month - Gregorian month (1-12)
+     * @param day - Gregorian day (1-31)
+     * @returns Julian date
+     */
     getJulianDate(year: number, month: number, day: number): number {
         if (month <= 2) {
             year -= 1;
@@ -210,6 +316,11 @@ export class Tithi {
         return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + b - 1524.5;
     }
 
+    /**
+     * Calculate the moon's longitude at a given time.
+     * @param t - Julian centuries since J2000
+     * @returns Moon's longitude in degrees
+     */
     getMoonLongitude(t: number): number {
         const L1 = 218.316 + 481267.8813 * t;
         const D = 297.8502 + 445267.1115 * t;
@@ -217,20 +328,37 @@ export class Tithi {
         const M1 = 134.963 + 477198.8671 * t;
         const F = 93.272 + 483202.0175 * t;
 
-        const moonLongitude = L1 + (6.289 * Math.sin(M1 * Math.PI / 180)) - (1.274 * Math.sin((2 * D - M1) * Math.PI / 180)) - (0.658 * Math.sin(2 * D * Math.PI / 180)) - (0.214 * Math.sin((2 * M1) * Math.PI / 180)) + (0.11 * Math.sin((D) * Math.PI / 180));
+        const moonLongitude = L1 
+            + (6.289 * Math.sin(M1 * Math.PI / 180)) 
+            - (1.274 * Math.sin((2 * D - M1) * Math.PI / 180)) 
+            - (0.658 * Math.sin(2 * D * Math.PI / 180)) 
+            - (0.214 * Math.sin(2 * M1 * Math.PI / 180)) 
+            + (0.11 * Math.sin(D * Math.PI / 180));
+
         return moonLongitude % 360;
     }
 
+    /**
+     * Calculate the sun's longitude at a given time.
+     * @param t - Julian centuries since J2000
+     * @returns Sun's longitude in degrees
+     */
     getSunLongitude(t: number): number {
         const l0 = 280.4665 + 36000.7698 * t;
         const m = 357.5291 + 35999.0503 * t;
         const c = (1.9146 - 0.004817 * t - 0.000014 * t * t) * Math.sin(m * Math.PI / 180)
                   + (0.019993 - 0.000101 * t) * Math.sin(2 * m * Math.PI / 180) 
                   + 0.000289 * Math.sin(3 * m * Math.PI / 180);
+
         const sunLongitude = l0 + c;
         return sunLongitude % 360;
     }
 
+    /**
+     * Get the name of the Tithi based on its index.
+     * @param tithiIndex - Index of the Tithi (0-29)
+     * @returns Name of the Tithi
+     */
     getTithiName(tithiIndex: number): string {
         const tithiNames = [
             "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", "पञ्चमी", 
@@ -243,6 +371,11 @@ export class Tithi {
         return tithiNames[tithiIndex];
     }
 
+    /**
+     * Get the Paksha based on the Tithi index.
+     * @param tithiIndex - Index of the Tithi (0-29)
+     * @returns Name of the Paksha ("शुक्ल" or "कृष्ण")
+     */
     getPaksha(tithiIndex: number): string {
         return tithiIndex < 15 ? "शुक्ल" : "कृष्ण";
     }
