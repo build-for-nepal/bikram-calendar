@@ -243,6 +243,9 @@ export class Bikram {
  */
     getMonthName(month: number): string {
         const nepaliMonths = ["बैसाख", "जेष्ठ", "आषाढ", "श्रावण", "भाद्र", "आश्विन", "कार्तिक", "मंसिर", "पौष", "माघ", "फागुन", "चैत"];
+        if (month < 1 || month > 12) {
+            throw new Error('Invalid month number');
+        }
         return nepaliMonths[month - 1];
     }
 }

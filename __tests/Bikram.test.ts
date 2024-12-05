@@ -47,4 +47,43 @@ describe('Bikram Date Conversion and tithi test', () => {
         expect(tithiResult.tithi).toBe("पञ्चमी");
         expect(tithiResult.paksha).toBe("शुक्ल");
     });
-});
+
+        it('should return the correct Nepali weekday name from gregorian date', () => {
+            const bikram = new Bikram();
+            expect(bikram.getWeekdayName(2024, 12, 5)).toBe('बिहीबार');
+            expect(bikram.getWeekdayName(2024, 12, 6)).toBe('शुक्रबार'); 
+            expect(bikram.getWeekdayName(2024, 12, 7)).toBe('शनिबार');
+            expect(bikram.getWeekdayName(2024, 12, 8)).toBe('आइतबार');
+        });
+
+        it('should return the correct Nepali weekday name from Bikram Sambat date', () => {
+            const bikram = new Bikram();
+            const gregorianDate = bikram.toGregorian(2081, 8, 20);
+            const testDay = bikram.getWeekdayName(gregorianDate.year, gregorianDate.month, gregorianDate.day);
+            expect(testDay).toBe("बिहीबार");
+        });
+
+        it('should handle leap years correctly', () => {
+            const bikram = new Bikram();
+            expect(bikram.getWeekdayName(2020, 2, 29)).toBe('शनिबार'); 
+        });
+
+        it('should handle edge cases correctly', () => {
+            const bikram = new Bikram();
+            expect(bikram.getWeekdayName(2024, 1, 1)).toBe('सोमबार');
+            expect(bikram.getWeekdayName(2024, 12, 31)).toBe('मंगलबार');
+        });
+
+        it('should return the correct Nepali month name for a given Gregorian date', () => {
+            const bikram = new Bikram();
+            bikram.fromGregorian(2024, 12, 5);
+            const testMonthName = bikram.getMonthName(bikram.getMonth());
+            expect(testMonthName).toBe('मंसिर');
+        });
+
+        it('should handle invalid month numbers gracefully', () => {
+            const bikram = new Bikram();
+            expect(() => bikram.getMonthName(0)).toThrow();
+            expect(() => bikram.getMonthName(13)).toThrow();
+        });
+    });
