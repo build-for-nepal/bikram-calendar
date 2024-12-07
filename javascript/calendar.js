@@ -134,26 +134,48 @@ calendarHTML += `<td class="${finalClass} ${saturdayClass}" onclick="showEventDe
 
 // loads yearly bikramFixedEvents from files
 function loadEventsForYear(year, callback) {
-    console.log(`Loading events for the year ${year}`);
-    const scriptUrl = `events/events-${year}.js`;
+    // Determine the script URL based on the year. This is a bit of a hack, but it works for now☺☺.
+    let scriptUrl;
+    if (year === 2081) {
+        scriptUrl = 'events/events-2081.js';
+        console.log(`Loading events for the year ${year}`);
+    } else if (year === 2082) {
+        scriptUrl = 'events/events-2082.js';
+        console.log(`Loading events for the year ${year}`);
+    } else if (year === 2083) {
+        scriptUrl = 'events/events-2083.js';
+        console.log(`Loading events for the year ${year}`);
+    } else {
+        scriptUrl = 'events/noevents.js'; // Load default if year is not recognized
+        console.log(`No events for the year ${year}`);
+       // const messageElement = document.getElementById('message');
+       // messageElement.textContent = `No events found for the year ${year}.`;
+    }
 
-    const scriptElement = document.createElement('script');
-    scriptElement.src = scriptUrl;
-    scriptElement.onload = () => {
-        // Check if the variable is defined after the script is loaded
-        if (typeof bikramFixedEvents !== 'undefined' && Array.isArray(bikramFixedEvents) && bikramFixedEvents.length > 0) {
-            callback(bikramFixedEvents);
-        } else {
-            console.log(`No events found in the file for the year ${year}.`);
+    // Load the events.js script
+    const eventScriptElement = document.createElement('script');
+    eventScriptElement.src = 'events/events.js';
+    eventScriptElement.onload = () => {
+
+        // Load the yearly events script
+        const yearScriptElement = document.createElement('script');
+        yearScriptElement.src = scriptUrl;
+        yearScriptElement.onload = () => {
             callback([]);
-        }
+        };
+        yearScriptElement.onerror = () => {
+            console.error(`Error loading script: ${scriptUrl}`);
+            callback([]);
+        };
+
+        document.head.appendChild(yearScriptElement);
     };
-    scriptElement.onerror = () => {
-        console.error(`Error loading script: ${scriptUrl}`);
+    eventScriptElement.onerror = () => {
+        console.error('Error loading events.js');
         callback([]);
     };
 
-    document.head.appendChild(scriptElement);
+    document.head.appendChild(eventScriptElement);
 }
 function checkEvent(events, year, month, day, dateType) {
     let hasEvent = false;
@@ -161,10 +183,10 @@ function checkEvent(events, year, month, day, dateType) {
         if ((event.startYear && year < event.startYear) || (event.endYear && year > event.endYear)) {
             return; // Skip this event if the current year is before the startYear or after the endYear
         }
-
+        /*
         if (event.showOnDay === false) {
-            return; // Skip this event if it should not be shown on the day cell
-        }
+            return; // Skip this event if it should not be shown on the day cell not used now.
+        }*/
 
         if (dateType === 'bikram') {
             const [eventYear, eventMonth, eventDay] = event.date.split('/').map(Number);

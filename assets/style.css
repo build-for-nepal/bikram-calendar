@@ -324,3 +324,48 @@ footer a:hover {
     color: #616161; /* Grey color */
     white-space: pre-wrap; /* To handle multiline event details */
 }
+
+@media print {
+    body {
+        margin: 0;
+        background-color: white;
+        color: auto;
+    }
+
+    .container {
+        box-shadow: none;
+        border: none;
+    }
+
+    h1 {
+        display: none;
+    }
+
+    .navigation {
+        display: none;
+    }
+
+    footer {
+        display: none; 
+    }
+    .ConverterLink {
+        display: none;
+    }
+
+    .modal {
+        display: none; 
+
+    .event {
+        font-size: 10px; 
+    }
+
+    th, td {
+        font-size: 12px;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+}
