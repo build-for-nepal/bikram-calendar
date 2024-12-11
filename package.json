@@ -1,12 +1,14 @@
 {
-  "name": "bikram-sambat",
-  "version": "1.0.0",
+  "name": "bikram-js",
+  "version": "1.0.1",
   "description": "Bikram Sambat date and Tithi library",
   "main": "dist/index.js",
+  "types": "src/types.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "clean": "rimraf dist node_modules"
+    "clean": "rimraf dist node_modules",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --out ./docs/docs"
   },
   "author": "Build-for-Nepal",
   "license": "GPL-3.0-or-later",
@@ -16,7 +18,8 @@
     "jest": "^29.7.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^29.2.5",
-    "typedoc": "^0.27.3"
+    "typedoc": "^0.27.4",
+    "typedoc-plugin-markdown": "^4.3.2"
   },
   "engines": {
     "node": ">=14.0.0"

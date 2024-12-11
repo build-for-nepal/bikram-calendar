@@ -1,0 +1,27 @@
+{
+  "name": "bikram-calendar",
+  "version": "1.0.0",
+  "description": "A Bikram Sambat Calendar web application",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "start": "browser-sync start --server --files 'index.html, css/*.css, js/*.js'",
+    "watch": "tsc -w",
+    "publish-live-page": "copyfiles ./index.html ./converter.html ./assets/** ./dist/** ./events/** ../docs/"
+  },
+  "devDependencies": {
+    "bikram-js": "^1.0.1",
+    "browser-sync": "^3.0.3",
+    "copyfiles": "^2.4.1",
+    "ts-loader": "^9.5.1",
+    "typedoc": "^0.27.4",
+    "typescript": "^5.5.4",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
+  },
+  "author": {
+    "name": "khumnath",
+    "email": "nath.khum@gmail.com"
+  },
+  "license": "GPL-3.0-or-later"
+}
