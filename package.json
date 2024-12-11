@@ -1,6 +1,6 @@
 {
   "name": "bikram-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Bikram Sambat date and Tithi library",
   "main": "dist/index.js",
   "types": "src/types.d.ts",
