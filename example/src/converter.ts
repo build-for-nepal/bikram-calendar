@@ -2,11 +2,14 @@ import {Bikram, Tithi} from 'bikram-js';
 
 
 let currentLanguage = 'nepali';
-(window as any).addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const languageSelect = document.getElementById("language") as HTMLSelectElement;
-    languageSelect.value = 'nepali';
-    changeLanguage(); 
+    if (languageSelect) {
+        languageSelect.value = 'nepali';
+        changeLanguage();
+    }
 });
+
 export function toggleConverter(): void {
     const gregorianToBikramContainer = document.getElementById('gregorianToBikramContainer');
     const bikramToGregorianContainer = document.getElementById('bikramToGregorianContainer');
