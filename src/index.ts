@@ -171,7 +171,7 @@ export class Bikram {
      * @param bsDay - Bikram Sambat day (1-31)
      * @returns Object containing year, month, and day
      */
-    toGregorian(bsYear: number, bsMonth: number, bsDay: number): { year: number; month: number; day: number } {
+        toGregorian(bsYear: number, bsMonth: number, bsDay: number): { year: number; month: number; day: number } {
         const YearSaka = bsYear - 135;
         const YearKali = YearSaka + 3179;
         let ahar = Math.floor((YearKali * this.YugaCivilDays) / this.YugaRotation_sun);
@@ -180,23 +180,44 @@ export class Bikram {
 
         while (saura_masa_num !== bsMonth || saura_masa_day !== bsDay) {
             ahar += (saura_masa_num < bsMonth || (saura_masa_num === bsMonth && saura_masa_day < bsDay)) ? 1 : -1;
-            ({ month: saura_masa_num, day: saura_masa_day } = this.getSauraMasaDay(ahar));
-        }
-
-        const julian_date = ahar + 588465.5;
+                ({ month: saura_masa_num, day: saura_masa_day } = this.getSauraMasaDay(ahar));
+            }
+        
+            const julian_date = ahar + 588465.5;
         return this.fromJulianDate(julian_date);
     }
 
         /**
-     * Get the Nepali date as a string.
-     * @returns Nepali date in YYYY-MM-DD format
-     */
-    fromNepali(bsYear: number, bsMonth: number, bsDay: number): void {
-        const { year, month, day } = this.toGregorian(bsYear, bsMonth, bsDay);
-        this.Year = year;
-        this.Month = month - 1; // Adjust for 0-based month
-        this.Day = day;
-    }
+ * Convert a Bikram Sambat date to a Gregorian date and store it in the instance.
+ * @param bsYear - Bikram Sambat year
+ * @param bsMonth - Bikram Sambat month (1-12)
+ * @param bsDay - Bikram Sambat day (1-32)
+ * 
+ * Example Usage:
+ * // Create an instance of the Bikram class
+ * const bikram = new Bikram();
+ * 
+ * // Bikram Sambat date to convert
+ * const bsYear = 2080;
+ * const bsMonth = 5;
+ * const bsDay = 15;
+ * 
+ * // Convert to Gregorian date and store in the instance
+ * bikram.fromNepali(bsYear, bsMonth, bsDay);
+ * 
+ * // Access the stored Gregorian date
+ * console.log(`Gregorian Year: ${bikram.Year}`);
+ * console.log(`Gregorian Month: ${bikram.Month + 1}`); // Adjust back to 1-based month
+ * console.log(`Gregorian Day: ${bikram.Day}`);
+ */
+fromNepali(bsYear: number, bsMonth: number, bsDay: number): void {
+    const { year, month, day } = this.toGregorian(bsYear, bsMonth, bsDay);
+    this.Year = year;
+    this.Month = month - 1; // Adjust for 0-based month
+    this.Day = day;
+}
+
+
 
         /**
      * Get the Bikram Sambat year.
