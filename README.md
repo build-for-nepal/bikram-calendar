@@ -1,6 +1,6 @@
 
 # Bikram-JS
-
+[![Package Documentation](https://img.shields.io/badge/docs-Documentation-blue.svg)](https://build-for-nepal.github.io/bikram-calendar/docs/)
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![NPM Version](https://img.shields.io/npm/v/bikram-js.svg)
 ![Build Status](https://img.shields.io/github/actions/workflow/status/build-for-nepal/bikram-calendar/test.yml)
@@ -180,7 +180,8 @@ try {
 
 ## Documentation
 
-Detailed documentation of functions are available in the `docs/docs` folder of this repository. You can find comprehensive guides and examples on using the `bikram-js` library.
+Detailed documentation of functions are available in the `docs/docs` folder or here [![Package Documentation](https://img.shields.io/badge/docs-Documentation-blue.svg)](https://build-for-nepal.github.io/bikram-calendar/docs/)
+. You can find comprehensive guides and examples on using the `bikram-js` library.
 
 To view the documentation:
 
