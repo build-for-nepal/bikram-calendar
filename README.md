@@ -3,6 +3,20 @@
 > finding first day of month may have 1 day off or 1 day more since julian day and ahar(julian apoach) is in Greenwich Mean Time ‎(UTC)‎.
 > thanks [@aj3sh](https://github.com/aj3sh) for testing those discrepancies. [conversation 🔗](https://github.com/opensource-nepal/node-nepali-datetime/issues/82#issuecomment-2559146283)
 
+:information_source: Observations after reviewing possible fixes 20250110:
+
+>1. The ahar value( julian day count) is based on Ujjain timezone. (ancient UTC of astrology).
+
+
+>2. Nepal's time zone has not been consistent and has changed over time. To obtain accurate results for past dates, the exact time zone and location, along with the date of the change, are required. https://en.m.wikipedia.org/wiki/Nepal_Standard_Time .
+
+
+>3. It is unclear whether calculations for the Bikram Sambat date in Nepal now uses Kathmandu's latitude and longitude or the Nepal Standard Time Zone's reference location.
+
+
+
+Understanding the specific location and time zone used is crucial for accurate results. Changes in time and location can affect day or month transitions, potentially causing misalignment with pre-calculated data.
+
 # Bikram-JS
 [![Package Documentation](https://img.shields.io/badge/docs-Documentation-blue.svg)](https://build-for-nepal.github.io/bikram-calendar/docs/)
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
